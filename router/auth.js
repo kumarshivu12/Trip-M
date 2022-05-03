@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const bycrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken');
 
 require("../db/conn");
 const User = require("../model/DriverDetails");
@@ -12,8 +14,10 @@ router.get("/", (req, res) => {
 
 // async-await
 // signup
-router.post("/register", async (req, res) => {
-  const { name, email, phone, city, DLNo, password, cpassword } = req.body;
+
+var user, dl, dlvc;
+router.post("/signup", async (req, res) => {
+  var { name, email, phone, city, DLNo, password, cpassword } = req.body;
   if (!name || !email || !phone || !city || !DLNo || !password || !cpassword) {
     return res.status(422).json({ error: "Fields are not correctly filled." });
   }
@@ -29,7 +33,7 @@ router.post("/register", async (req, res) => {
     if(password != cpassword){
       return res.status(422).json({ error: "password incorrect" });
     }
-    const user = new User({
+    user = new User({
       name,
       email,
       phone,
@@ -38,46 +42,48 @@ router.post("/register", async (req, res) => {
       password,
       cpassword,
     });
-    await user.save();
+    
   } catch (err) {
     console.log(err);
   }
 });
 
-router.post("/register/dl-details", async (req, res) => {
-  const { licenceno, issueDate, validUpto, OLAuthority, dob, address } = req.body;
-  if (!licenceno || !issueDate || !validUpto || !OLAuthority || !dob || !address) {
+router.post("/signup/dldetails", async (req, res) => {
+  const { issueDate, validUpto, OLAuthority, dob, address } = req.body;
+  if ( !issueDate || !validUpto || !OLAuthority || !dob || !address) {
     return res.status(422).json({ error: "Fields are not correctly filled." });
   }
   try {
     
-    const dl = new DLD({
-      licenceno,
-      issueDate,
-      validUpto,
-      OLAuthority,
-      dob,
-      address,
+    dl = new DLD({
+      licenceno: user.DLNo,
+      issueDate : issueDate,
+      validUpto : validUpto,
+      OLAuthority : OLAuthority,
+      dob : dob,
+      address : address,
     });
-    await dl.save();
+    
   } catch (err) {
     console.log(err);
   }
 });
 
-router.post("/register/dl-details/dl-vehicleclass", async (req, res) => {
-  const { licenceno, vehicleClass, issueDate, expiryDate } = req.body;
-  if (!licenceno || !vehicleClass || !issueDate || !expiryDate ) {
+router.post("/signup/dldetails/dlvehicleclass", async (req, res) => {
+  const { vehicleClass, issueDate, expiryDate } = req.body;
+  if ( !vehicleClass || !issueDate || !expiryDate ) {
     return res.status(422).json({ error: "Fields are not correctly filled." });
   }
   try {
 
-    const dlvc = new DLVC({
-      licenceno,
-      vehicleClass,
-      issueDate,
-      expiryDate,
+    dlvc = new DLVC({
+      licenceno : user.DLNo,
+      vehicleClass : vehicleClass,
+      issueDate : issueDate,
+      expiryDate : expiryDate,
     });
+    await user.save();
+    await dl.save();
     await dlvc.save();
   } catch (err) {
     console.log(err);
@@ -94,11 +100,25 @@ router.post('/signin', async (req, res) => {
     }
     const userLogin = await User.findOne({email:email});
 
-    if(!userLogin){
-      res.status(400).json({error: "not found"});
+    if(userLogin){
+      const isMatch = await bycrypt.compare(password, userLogin.password);
+
+      if (!isMatch) {
+        res.status(400).json({ error: "not found" });
+      } else {
+        
+        const token = await userLogin.generateAuthToken();
+        res.cookie("jwtoken", token, {
+          expires: new Date(Date.now() + 864000000),
+          httpOnly: true
+        });
+        res.json({ message: "user signin success" });
+      }
     }else{
-      res.json({message: "user signin success"});
+      res.json({ message: "Invalid Credentials" });
+      
     }
+    
   }
   catch(err){
     console.log(err);

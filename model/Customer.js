@@ -1,15 +1,11 @@
 const mongoose = require("mongoose");
 
-const cutomerSchema = new mongoose.Schema({
+const customerSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
   },
   phone: {
-    type: Number,
-    required: true,
-  },
-  cid: {
     type: Number,
     required: true,
   },

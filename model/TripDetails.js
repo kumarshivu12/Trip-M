@@ -14,7 +14,7 @@ const tripSchema = new mongoose.Schema({
     required: true,
   },
   cid: {
-    type: Number,
+    type: String,
     required: true,
   },
   fromPlace: {
