@@ -12,6 +12,7 @@ const authenticate = async (req, res, next) => {
         req.token = token;
         req.rootUser = rootUser;
         req.userid = rootUser._id;
+        req.name = rootUser.name;
 
         next();
     } catch (err) {

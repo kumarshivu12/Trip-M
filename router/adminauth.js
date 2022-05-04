@@ -17,10 +17,7 @@ router.get("/", (req, res) => {
 
 var admin;
 
-router.get("/admin-register", (req, res) => {
-    res.send("Admin page");
-})
-.post("/admin-register", async (req, res) => {
+router.post("/admin-register", async (req, res) => {
     var { name, email, password, cpassword } = req.body;
     if (!name || !email || !password || !cpassword) {
         return res.status(422).json({ error: "Fields are not correctly filled." });
@@ -82,10 +79,9 @@ router.post('/admin-login', async (req, res) => {
     }
 });
 
-router.get("/admin-dashboard", authenticate ,(req, res) => {
-    res.send("signup page");
+router.get("/admin-dashboard", authenticate, (req, res) => {
+    res.send(req.rootUser);
 });
-
 
 module.exports = router;
 
