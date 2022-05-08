@@ -22,25 +22,6 @@ const PORT = process.env.PORT;
 
 // middleware
 
-const middleware = (req, res, next) => {
-  console.log("middleware");
-};
-
-// app.get("/", (req, res) => {
-//   res.send("home page");
-// });
-
-app.get("/cutomer",  (req, res) => {
-  res.send("trip page");
-});
-
-app.get("/income", (req, res) => {
-  res.send("startup page"); 
-});
-
-app.get("/signin", (req, res) => {
-  res.send("signup page");
-});
 
 
 

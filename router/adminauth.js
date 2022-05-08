@@ -83,6 +83,11 @@ router.get("/admin-dashboard", authenticate, (req, res) => {
     res.send(req.rootUser);
 });
 
+router.get("/admin-logout", (req, res) => {
+    res.clearCookie("jwtoken", {path: '/'});
+    res.status(200).send("Logout")
+});
+
 module.exports = router;
 
 

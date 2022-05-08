@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
 // signup
 
 var user, dl, dlvc;
-router.post("/signup", async (req, res) => {
+router.post("/add-driver", async (req, res) => {
   var { name, email, phone, city, DLNo, password, cpassword } = req.body;
   if (!name || !email || !phone || !city || !DLNo || !password || !cpassword) {
     return res.status(422).json({ error: "Fields are not correctly filled." });
@@ -42,13 +42,15 @@ router.post("/signup", async (req, res) => {
       password,
       cpassword,
     });
-    
+    if(user){
+      return res.status(200).json({"message" : "success"});
+    }
   } catch (err) {
     console.log(err);
   }
 });
 
-router.post("/signup/dldetails", async (req, res) => {
+router.post("/add-driver/dldetails", async (req, res) => {
   const { issueDate, validUpto, OLAuthority, dob, address } = req.body;
   if ( !issueDate || !validUpto || !OLAuthority || !dob || !address) {
     return res.status(422).json({ error: "Fields are not correctly filled." });
@@ -63,13 +65,17 @@ router.post("/signup/dldetails", async (req, res) => {
       dob : dob,
       address : address,
     });
+
+    if (dl) {
+      return res.status(200).json({ "message": "success" });
+    }
     
   } catch (err) {
     console.log(err);
   }
 });
 
-router.post("/signup/dldetails/dlvehicleclass", async (req, res) => {
+router.post("/add-driver/dldetails/dlvehicleclass", async (req, res) => {
   const { vehicleClass, issueDate, expiryDate } = req.body;
   if ( !vehicleClass || !issueDate || !expiryDate ) {
     return res.status(422).json({ error: "Fields are not correctly filled." });
@@ -82,9 +88,13 @@ router.post("/signup/dldetails/dlvehicleclass", async (req, res) => {
       issueDate : issueDate,
       expiryDate : expiryDate,
     });
+    if (dlvc) {
+      return res.status(200).json({ "message": "success" });
+    }
     await user.save();
     await dl.save();
     await dlvc.save();
+    
   } catch (err) {
     console.log(err);
   }
