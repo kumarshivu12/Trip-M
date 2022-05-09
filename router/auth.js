@@ -19,19 +19,19 @@ var user, dl, dlvc;
 router.post("/add-driver", async (req, res) => {
   var { name, email, phone, city, DLNo, password, cpassword } = req.body;
   if (!name || !email || !phone || !city || !DLNo || !password || !cpassword) {
-    return res.status(422).json({ error: "Fields are not correctly filled." });
+    return res.status(422).json({ message: "Fields are not correctly filled." });
   }
   try {
     const UserExist = await User.findOne({ email: email });
     if (UserExist) {
-      return res.status(422).json({ error: "User already exist" });
+      return res.status(422).json({ message: "User already exist" });
     }
     const dlExist = await User.findOne({ DLNo: DLNo });
     if (dlExist) {
-      return res.status(422).json({ error: "Licence already exist" });
+      return res.status(422).json({ message: "Licence already exist" });
     }
     if(password != cpassword){
-      return res.status(422).json({ error: "password incorrect" });
+      return res.status(422).json({ message: "password incorrect" });
     }
     user = new User({
       name,
@@ -43,7 +43,7 @@ router.post("/add-driver", async (req, res) => {
       cpassword,
     });
     if(user){
-      return res.status(200).json({"message" : "success"});
+      return res.status(200).json({message : "success"});
     }
   } catch (err) {
     console.log(err);
@@ -53,7 +53,7 @@ router.post("/add-driver", async (req, res) => {
 router.post("/add-driver/dldetails", async (req, res) => {
   const { issueDate, validUpto, OLAuthority, dob, address } = req.body;
   if ( !issueDate || !validUpto || !OLAuthority || !dob || !address) {
-    return res.status(422).json({ error: "Fields are not correctly filled." });
+    return res.status(422).json({ message: "Fields are not correctly filled." });
   }
   try {
     
@@ -67,7 +67,7 @@ router.post("/add-driver/dldetails", async (req, res) => {
     });
 
     if (dl) {
-      return res.status(200).json({ "message": "success" });
+      return res.status(200).json({ message: "success" });
     }
     
   } catch (err) {
@@ -78,7 +78,7 @@ router.post("/add-driver/dldetails", async (req, res) => {
 router.post("/add-driver/dldetails/dlvehicleclass", async (req, res) => {
   const { vehicleClass, issueDate, expiryDate } = req.body;
   if ( !vehicleClass || !issueDate || !expiryDate ) {
-    return res.status(422).json({ error: "Fields are not correctly filled." });
+    return res.status(422).json({ message: "Fields are not correctly filled." });
   }
   try {
 
@@ -88,13 +88,12 @@ router.post("/add-driver/dldetails/dlvehicleclass", async (req, res) => {
       issueDate : issueDate,
       expiryDate : expiryDate,
     });
-    if (dlvc) {
-      return res.status(200).json({ "message": "success" });
-    }
     await user.save();
     await dl.save();
     await dlvc.save();
-    
+    if (dlvc) {
+      return res.status(200).json({message: "success"});
+    }
   } catch (err) {
     console.log(err);
   }
@@ -106,7 +105,7 @@ router.post('/signin', async (req, res) => {
   try{
     const {email, password} = req.body;
     if(!email || !password){
-      return res.status(404).json({error: "PLZ fill the data"})
+      return res.status(404).json({ message: "PLZ fill the data"})
     }
     const userLogin = await User.findOne({email:email});
 
@@ -114,7 +113,7 @@ router.post('/signin', async (req, res) => {
       const isMatch = await bycrypt.compare(password, userLogin.password);
 
       if (!isMatch) {
-        res.status(400).json({ error: "not found" });
+        res.status(400).json({message: "not found" });
       } else {
         
         const token = await userLogin.generateAuthToken();
@@ -142,7 +141,7 @@ module.exports = router;
 // router.post("/register", (req, res) => {
 //   const { name, email, phone, city, DLNo, password, cpassword } = req.body;
 //   if (!name || !email || !phone || !city || !DLNo || !password || !cpassword) {
-//     return res.status(422).json({ error: "Fields are not correctly filled." });
+//     return res.status(422).json({ message: "Fields are not correctly filled." });
 //   }
 //   // console.log(name);
 //   // console.log(email);
@@ -150,7 +149,7 @@ module.exports = router;
 //   User.findOne({ email: email })
 //     .then((UserExist) => {
 //       if (UserExist) {
-//         return res.status(422).json({ error: "User already exist" });
+//         return res.status(422).json({ message: "User already exist" });
 //       }
 //       const user = new User({
 //         name,
@@ -164,7 +163,7 @@ module.exports = router;
 //       user
 //         .save()
 //         .then(() => {
-//           res.status(201).json({ message: "Registration Successfull" });
+//           res.status(201).json({message "Registration Successfull" });
 //         })
 //         .catch((err) => res.status(500).json({ error: "Registration Failed" }));
 //     })
