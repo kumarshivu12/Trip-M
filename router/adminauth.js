@@ -1,11 +1,16 @@
+const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const bycrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
 const authenticate = require("../middleware/authenticate");
 
+
 require("../db/conn");
 const Admin = require("../model/AdminDetails");
+const Drivers = require("../model/DriverDetails");
+const DL = require("../model/DLDetails");
+const Drivers = require("../model/DriverDetails");
 
 
 router.get("/", (req, res) => {
@@ -83,10 +88,35 @@ router.get("/admin-dashboard", authenticate, (req, res) => {
     res.send(req.rootUser);
 });
 
-router.get("/admin-logout", (req, res) => {
+router.get("/admin-logout", authenticate, (req, res) => {
     res.clearCookie("jwtoken", {path: '/'});
     res.status(200).send("Logout")
 });
+
+router.get("/drivers", authenticate, async (req, res) => {
+    const alldrivers = await Drivers.find();
+    if (!alldrivers) {
+        res.status(502).send("No drivers");
+    }
+    else{
+        req.alldrivers = alldrivers
+        res.status(200).send(req.alldrivers);
+    }
+});
+
+router.get("/profile/:driverID", authenticate, async (req, res) => {
+
+    const Onedriver = await Drivers.findById(req.params.driverID);
+    if (!Onedriver) {
+        res.status(502).send("Not able to find one ");
+    }
+    else {
+        req.Onedriver = Onedriver;
+        res.status(200).send(req.Onedriver);
+    }
+});
+
+//  try to use findbyId and do reset the rest. Hope this works.
 
 module.exports = router;
 
