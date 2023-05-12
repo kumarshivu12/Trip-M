@@ -10,12 +10,78 @@ require("../db/conn");
 const Admin = require("../model/AdminDetails");
 const Drivers = require("../model/DriverDetails");
 const DL = require("../model/DLDetails");
-const Drivers = require("../model/DriverDetails");
+const DLVC = require("../model/DLVehicleClass");
+const {Trip} = require("../model/TripDetails");
 
+const getBeginningOfTheWeek = (now) => {
+    const days = (now.getDay() + 7 - 1) % 7;
+    now.setDate(now.getDate() - days);
+    now.setHours(0, 0, 0, 0);
+    return now;
+};
 
-router.get("/", (req, res) => {
-    res.send("home page from server router js");
-});
+router.get("/admin", authenticate, async (req, res) => {
+    const thisYear = new Date().getFullYear();
+
+    const trip = await Trip.aggregate([
+        {
+            $match: { "tripDate": { $gte: new Date(thisYear, 01, 01), $lt: new Date(thisYear, 12, 31) } }
+        },
+        {
+            $group:
+            {
+                _id: { month: { $month: "$tripDate" }, year: {$year: "$tripDate"} },
+                totalAmount: { $sum: "$GrossIncome" },
+                commission: { $sum: "$Commission" },
+                trips: {$sum: 1}
+            }
+            
+        }
+        
+    ]).exec();
+
+    const week = await Trip.aggregate([
+        {
+            $match: {"tripDate": { $gte: getBeginningOfTheWeek(new Date()), $lt: new Date() }}
+        },
+        {
+            $group:
+            {
+                _id: null,
+                total: { $sum: "$GrossIncome" }
+            }
+        }
+    ]).exec();
+
+    const year = await Trip.aggregate([
+        {
+            $match: { "tripDate": { $gte: new Date(thisYear, 01, 01), $lt: new Date(thisYear, 12, 31) } }
+        },
+        {
+            $group:
+            {
+                _id: null,
+                total: { $sum: "$GrossIncome" }
+            }
+        }
+        
+    ]).exec();
+
+    const responseData = {
+        admin: req.name,
+        trip: trip,
+        week: week,
+        year: year
+    }
+    
+    if (!trip) {
+        res.status(502).send("No trips");
+    }
+    else {
+        const jsonContent = JSON.stringify(responseData);
+        res.status(200).send(jsonContent);
+    }
+})
 
 // async-await
 // signup
@@ -84,8 +150,8 @@ router.post('/admin-login', async (req, res) => {
     }
 });
 
-router.get("/admin-dashboard", authenticate, (req, res) => {
-    res.send(req.rootUser);
+router.get("/admin", authenticate, (req, res) => {
+    
 });
 
 router.get("/admin-logout", authenticate, (req, res) => {
@@ -93,7 +159,7 @@ router.get("/admin-logout", authenticate, (req, res) => {
     res.status(200).send("Logout")
 });
 
-router.get("/drivers", authenticate, async (req, res) => {
+router.get("/admin/drivers", authenticate, async (req, res) => {
     const alldrivers = await Drivers.find();
     if (!alldrivers) {
         res.status(502).send("No drivers");
@@ -104,18 +170,60 @@ router.get("/drivers", authenticate, async (req, res) => {
     }
 });
 
-router.get("/profile/:driverID", authenticate, async (req, res) => {
-
+router.get("/admin/profile/:driverID", authenticate, async (req, res) => {
     const Onedriver = await Drivers.findById(req.params.driverID);
-    if (!Onedriver) {
-        res.status(502).send("Not able to find one ");
+
+    if(Onedriver){
+        try {
+            const dl = await DL.findOne({ licenceno: Onedriver.DLNo });
+            const dlvc = await DLVC.find({ licenceno: Onedriver.DLNo });
+            if (dl) {
+                const responseData = {
+                    name: Onedriver.name,
+                    email: Onedriver.email,
+                    phone: Onedriver.phone,
+                    city: Onedriver.city,
+                    dl: Onedriver.DLNo,
+                    iD: dl.issueDate,
+                    valid: dl.validUpto,
+                    ol: dl.OLAuthority,
+                    dob: dl.dob,
+                    address: dl.address,
+                    vc : dlvc
+                }
+                const jsonContent = JSON.stringify(responseData);
+                res.status(200).send(jsonContent);
+            }
+            else {
+                console.log(dl);
+                res.status(502).send("Licence details not found");
+            }
+        } catch (err) {
+            console.log(err);
+        }
+        
     }
-    else {
-        req.Onedriver = Onedriver;
-        res.status(200).send(req.Onedriver);
+    else{
+        res.status(502).send("Driver details not found");
     }
 });
 
+// const requestListener = (req, res) => {
+//     console.log("Request is Incoming");
+
+//     const responseData = {
+//         message: "Hello, GFG Learner",
+//         articleData: {
+//             articleName: "How to send JSON response from NodeJS",
+//             category: "NodeJS",
+//             status: "published"
+//         },
+//         endingMessage: "Visit Geeksforgeeks.org for more"
+//     }
+
+//     const jsonContent = JSON.stringify(responseData);
+//     res.end(jsonContent);
+// };
 //  try to use findbyId and do reset the rest. Hope this works.
 
 module.exports = router;

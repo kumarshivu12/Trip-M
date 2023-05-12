@@ -16,15 +16,14 @@ app.use(cookieParser())
 app.use(require("./router/auth")); // router files linking
 app.use(require("./router/trip"));
 app.use(require("./router/adminauth"));
+app.use(require("./router/agent"));
+app.use(require("./router/vehicle"));
 
+const PORT = process.env.PORT || 5000;
 
-const PORT = process.env.PORT;
-
-// middleware
-
-
-
-
+if (process.env.NODE_ENV == "production"){
+  app.use(express.static("client/build"));
+}
 app.listen(PORT, () => {
   console.log(`shreya sharma hello ${PORT} `);
 });
