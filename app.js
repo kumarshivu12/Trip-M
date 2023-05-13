@@ -19,11 +19,8 @@ app.use(require("./router/adminauth"));
 app.use(require("./router/agent"));
 app.use(require("./router/vehicle"));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-if (process.env.NODE_ENV == "production"){
-  app.use(express.static("client/build"));
-}
 app.listen(PORT, () => {
   console.log(`shreya sharma hello ${PORT} `);
 });
