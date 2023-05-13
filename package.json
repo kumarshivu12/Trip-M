@@ -20,11 +20,11 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shreyasharma0201/TripM-server.git"
+    "url": "git+https://github.com/shreyasharma0201/TripM-backend.git"
   },
   "bugs": {
-    "url": "https://github.com/shreyasharma0201/TripM-server/issues"
+    "url": "https://github.com/shreyasharma0201/TripM-backend/issues"
   },
-  "homepage": "https://github.com/shreyasharma0201/TripM-server#readme",
+  "homepage": "https://github.com/shreyasharma0201/TripM-backend#readme",
   "description": ""
 }
