@@ -4,7 +4,6 @@ const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 
-
 dotenv.config({ path: "./config.env" });
 
 require("./db/conn");
@@ -25,7 +24,7 @@ app.use(require("./router/adminauth"));
 app.use(require("./router/agent"));
 app.use(require("./router/vehicle"));
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log(`shreya sharma hello ${PORT} `);
