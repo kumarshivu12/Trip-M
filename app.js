@@ -25,8 +25,8 @@ app.use(require("./router/adminauth"));
 app.use(require("./router/agent"));
 app.use(require("./router/vehicle"));
 
-// const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 6010;
 
-// app.listen(PORT, () => {
-//   console.log(`shreya sharma hello ${PORT} `);
-// });
+app.listen(PORT, () => {
+  console.log(`shreya sharma hello ${PORT} `);
+});
