@@ -25,7 +25,7 @@ router.get("/admin", authenticate, async (req, res) => {
 
     const trip = await Trip.aggregate([
         {
-            $match: { "tripDate": { $gte: new Date(thisYear, 01, 01), $lt: new Date(thisYear, 12, 31) } }
+            $match: { "tripDate": { $gte: new Date(thisYear, 0o1, 0o1), $lt: new Date(thisYear, 12, 31) } }
         },
         {
             $group:
@@ -55,7 +55,7 @@ router.get("/admin", authenticate, async (req, res) => {
 
     const year = await Trip.aggregate([
         {
-            $match: { "tripDate": { $gte: new Date(thisYear, 01, 01), $lt: new Date(thisYear, 12, 31) } }
+            $match: { "tripDate": { $gte: new Date(thisYear, 0o1, 0o1), $lt: new Date(thisYear, 12, 31) } }
         },
         {
             $group:
