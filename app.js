@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 dotenv.config({ path: "./config.env" });
 
@@ -13,12 +14,9 @@ app.use(cookieParser());
 // It parses incoming requests with JSON payloads and is based on body-parser.
 
 // cors error
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://6460839423d90c4bd8c69726--chipper-crepe-a7fb0e.netlify.app/"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
+app.use(cors({
+  origin: '*'
+}));
 app.use(require("./router/auth")); // router files linking
 app.use(require("./router/trip"));
 app.use(require("./router/adminauth"));
