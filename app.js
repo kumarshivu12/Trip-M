@@ -14,9 +14,7 @@ app.use(cookieParser());
 // It parses incoming requests with JSON payloads and is based on body-parser.
 
 // cors error
-app.use(cors({
-  origin: '*'
-}));
+app.use(cors());
 app.use(require("./router/auth")); // router files linking
 app.use(require("./router/trip"));
 app.use(require("./router/adminauth"));
