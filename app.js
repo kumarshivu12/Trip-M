@@ -8,7 +8,11 @@ const cors = require('cors');
 dotenv.config({ path: "./config.env" });
 
 // cors error
-app.use(cors());
+app.use(cors({
+  origin: process.env.FrontEnd,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+  credentials: true,
+}));
 
 require("./db/conn");
 app.use(express.json());
